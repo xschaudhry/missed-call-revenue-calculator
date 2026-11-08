@@ -1,0 +1,384 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Missed Call Calculator</title>
+<meta name="description" content="Find out how much revenue your service business loses to missed calls each month. Free calculator by TRXmode.">
+<meta property="og:title" content="What are missed calls costing you?">
+<meta property="og:description" content="Enter your numbers and see the monthly revenue walking out the door.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@62..125,400..800&family=Source+Sans+3:wght@400;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #F2F5F8;
+    --surface: #FFFFFF;
+    --ink: #14202E;
+    --ink-soft: #4A5868;
+    --line: #D9E0E8;
+    --navy: #1F3A5F;
+    --missed: #D93A2B;
+    --missed-tint: #FCEDEB;
+    --recover: #1E8E5A;
+    --focus: #2F6FED;
+    --display: "Archivo", "Arial Narrow", sans-serif;
+    --body: "Source Sans 3", "Segoe UI", sans-serif;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --bg: #0F1823; --surface: #172331; --ink: #E8EEF5; --ink-soft: #A3B1C2;
+      --line: #2A3A4C; --navy: #9DB8DD; --missed: #FF6B5C; --missed-tint: #3A1E1D; --recover: #46C38A; --focus: #7FA6FF;
+    }
+  }
+  :root[data-theme="dark"] {
+    --bg: #0F1823; --surface: #172331; --ink: #E8EEF5; --ink-soft: #A3B1C2;
+    --line: #2A3A4C; --navy: #9DB8DD; --missed: #FF6B5C; --missed-tint: #3A1E1D; --recover: #46C38A; --focus: #7FA6FF;
+  }
+
+  * { box-sizing: border-box; }
+  html { -webkit-text-size-adjust: 100%; }
+  body { margin: 0; background: var(--bg); color: var(--ink); font: 400 17px/1.55 var(--body); }
+  a { color: var(--navy); }
+  :focus-visible { outline: 3px solid var(--focus); outline-offset: 2px; border-radius: 4px; }
+
+  .wrap { max-width: 1120px; margin: 0 auto; padding: 0 16px; }
+  header.top { padding: 22px 0 0; }
+  .brand { font: 700 15px/1 var(--display); font-stretch: 110%; color: var(--navy); text-decoration: none; letter-spacing: .02em; }
+
+  .intro { padding: 40px 0 28px; max-width: 46rem; }
+  h1 { font: 800 clamp(34px, 6vw, 60px)/1.02 var(--display); font-stretch: 75%; margin: 0 0 14px; letter-spacing: -.01em; }
+  .intro p { margin: 0; color: var(--ink-soft); font-size: 19px; max-width: 38rem; }
+
+  .grid { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1.05fr); gap: 32px; align-items: start; padding-bottom: 56px; }
+
+  /* Inputs */
+  form { background: var(--surface); border: 1px solid var(--line); border-radius: 14px; padding: 24px; }
+  .field { padding: 18px 0; border-top: 1px solid var(--line); }
+  .field:first-child { border-top: 0; padding-top: 0; }
+  .field label, .field legend { display: block; font-weight: 600; margin-bottom: 2px; }
+  .hint { color: var(--ink-soft); font-size: 15px; margin: 0 0 10px; }
+  select, input[type="number"] {
+    font: 600 17px var(--body); color: var(--ink); background: var(--bg);
+    border: 1px solid var(--line); border-radius: 8px; padding: 9px 12px;
+  }
+  select { width: 100%; }
+  .pair { display: flex; gap: 14px; align-items: center; }
+  .pair input[type="range"] { flex: 1; min-width: 0; }
+  .pair .num { display: flex; align-items: center; gap: 4px; }
+  .pair input[type="number"] { width: 104px; text-align: right; }
+  .unit { color: var(--ink-soft); font-weight: 600; min-width: 1ch; }
+  input[type="range"] { accent-color: var(--navy); height: 28px; }
+
+  /* Result: the call log */
+  .result { position: sticky; top: 20px; }
+  .phone { background: var(--surface); border: 1px solid var(--line); border-radius: 22px; overflow: hidden; }
+  .total { padding: 26px 26px 20px; border-bottom: 1px solid var(--line); }
+  .total .label { margin: 0; color: var(--ink-soft); font-weight: 600; }
+  .money { font: 800 clamp(48px, 8vw, 84px)/1 var(--display); font-stretch: 70%; color: var(--missed); margin: 6px 0 8px; font-variant-numeric: tabular-nums; }
+  .sub { margin: 0; color: var(--ink-soft); }
+  .sub strong { color: var(--ink); }
+
+  .log-head { display: flex; justify-content: space-between; align-items: baseline; padding: 16px 26px 6px; }
+  .log-head h2 { font: 700 17px var(--display); font-stretch: 100%; margin: 0; }
+  .log-head span { color: var(--ink-soft); font-size: 15px; }
+  ol.log { list-style: none; margin: 0; padding: 0 0 6px; }
+  .log li { display: grid; grid-template-columns: 26px 1fr auto; gap: 12px; align-items: center; padding: 10px 26px; border-top: 1px solid var(--line); }
+  .log li:first-child { border-top: 0; }
+  .log .icon { width: 26px; height: 26px; color: var(--missed); }
+  .log .who { font-weight: 600; line-height: 1.25; }
+  .log .when { color: var(--ink-soft); font-size: 14px; }
+  .log .val { font: 700 16px var(--display); font-variant-numeric: tabular-nums; text-align: right; color: var(--ink-soft); }
+  .log li.job { background: var(--missed-tint); }
+  .log li.job .val { color: var(--missed); }
+  .log .more { display: block; color: var(--ink-soft); font-size: 15px; padding: 10px 26px 14px; border-top: 1px solid var(--line); }
+
+  .recover { padding: 18px 26px 24px; border-top: 1px solid var(--line); }
+  .recover p { margin: 0 0 14px; }
+  .recover .green { color: var(--recover); font-weight: 700; }
+  .cta { display: inline-block; background: var(--navy); color: var(--surface); text-decoration: none; font-weight: 600; padding: 13px 20px; border-radius: 10px; }
+  .cta:hover { filter: brightness(1.12); }
+  .ghost { background: none; border: 1px solid var(--line); color: var(--ink); font: 600 16px var(--body); padding: 12px 16px; border-radius: 10px; cursor: pointer; margin-left: 8px; }
+  .actions { display: flex; flex-wrap: wrap; gap: 8px 0; align-items: center; }
+  .status { min-height: 1.4em; margin: 10px 0 0; color: var(--recover); font-size: 15px; }
+
+  /* Math */
+  details { margin-top: 18px; background: var(--surface); border: 1px solid var(--line); border-radius: 14px; padding: 4px 22px; }
+  summary { cursor: pointer; font-weight: 600; padding: 14px 0; }
+  .math { font-variant-numeric: tabular-nums; padding-bottom: 16px; color: var(--ink-soft); }
+  .math p { margin: 0 0 8px; }
+  .math strong { color: var(--ink); }
+
+  footer { border-top: 1px solid var(--line); padding: 22px 0 40px; color: var(--ink-soft); font-size: 15px; }
+  footer p { margin: 0 0 6px; max-width: 46rem; }
+
+  /* Mobile sticky total */
+  .peek { display: none; }
+  @media (max-width: 860px) {
+    .grid { grid-template-columns: minmax(0, 1fr); gap: 20px; }
+    .result { position: static; }
+    form { padding: 18px; }
+    .total, .recover { padding-left: 18px; padding-right: 18px; }
+    .log li { padding: 10px 18px; }
+    .log-head, .log .more { padding-left: 18px; padding-right: 18px; }
+    .peek {
+      display: flex; justify-content: space-between; align-items: center; gap: 12px;
+      position: fixed; left: 0; right: 0; bottom: 0; z-index: 5;
+      background: var(--surface); border-top: 1px solid var(--line); padding: 10px 16px calc(10px + env(safe-area-inset-bottom));
+      transition: transform .25s ease;
+    }
+    .peek.hide { transform: translateY(110%); }
+    .peek span { color: var(--ink-soft); font-size: 15px; }
+    .peek b { font: 800 26px var(--display); font-stretch: 75%; color: var(--missed); font-variant-numeric: tabular-nums; }
+    .peek a { font-weight: 600; font-size: 15px; }
+    body { padding-bottom: 64px; }
+  }
+  @media (max-width: 420px) {
+    .pair input[type="number"] { width: 86px; }
+    .ghost { margin-left: 0; }
+  }
+  @media (prefers-reduced-motion: reduce) { .peek { transition: none; } }
+</style>
+</head>
+<body>
+<header class="top wrap"><a class="brand" href="https://trxmode.com">TRXmode</a></header>
+
+<main class="wrap">
+  <section class="intro">
+    <h1>What are missed calls costing your business?</h1>
+    <p>Every call that rings out or hits a full voicemail is a customer who dials the next business on Google. Put in your own numbers and see what that adds up to each month.</p>
+  </section>
+
+  <div class="grid">
+    <form id="calc" novalidate>
+      <div class="field">
+        <label for="niche">Your type of business</label>
+        <p class="hint">Fills in typical numbers. Change any of them below.</p>
+        <select id="niche">
+          <option value="dental">Dental practice</option>
+          <option value="medspa">Med spa</option>
+          <option value="hvac" selected>HVAC</option>
+          <option value="plumbing">Plumbing</option>
+          <option value="auto">Auto repair</option>
+          <option value="roofing">Roofing</option>
+          <option value="chiro">Chiropractic</option>
+          <option value="custom">Something else</option>
+        </select>
+      </div>
+
+      <div class="field">
+        <label for="calls-n">Missed calls per week</label>
+        <p class="hint">Calls nobody answered: after hours, lunch, busy lines. Check your phone log if you can.</p>
+        <div class="pair">
+          <input type="range" id="calls-r" min="0" max="100" step="1" aria-label="Missed calls per week slider">
+          <span class="num"><input type="number" id="calls-n" min="0" max="1000" step="1" inputmode="numeric"><span class="unit"></span></span>
+        </div>
+      </div>
+
+      <div class="field">
+        <label for="newp-n">Share that are new customers</label>
+        <p class="hint">The rest are existing customers, suppliers or spam.</p>
+        <div class="pair">
+          <input type="range" id="newp-r" min="0" max="100" step="5" aria-label="New customer share slider">
+          <span class="num"><input type="number" id="newp-n" min="0" max="100" step="1" inputmode="numeric"><span class="unit">%</span></span>
+        </div>
+      </div>
+
+      <div class="field">
+        <label for="book-n">Share you’d normally book</label>
+        <p class="hint">Out of new callers you actually speak to, how many become a job or appointment?</p>
+        <div class="pair">
+          <input type="range" id="book-r" min="0" max="100" step="5" aria-label="Booking rate slider">
+          <span class="num"><input type="number" id="book-n" min="0" max="100" step="1" inputmode="numeric"><span class="unit">%</span></span>
+        </div>
+      </div>
+
+      <div class="field">
+        <label for="value-n">Average job or first-visit value</label>
+        <p class="hint">What a typical new customer spends with you. Leave out lifetime value to stay conservative.</p>
+        <div class="pair">
+          <input type="range" id="value-r" min="50" max="20000" step="50" aria-label="Average job value slider">
+          <span class="num"><span class="unit">$</span><input type="number" id="value-n" min="0" max="1000000" step="10" inputmode="numeric"></span>
+        </div>
+      </div>
+    </form>
+
+    <aside class="result" aria-labelledby="total-label">
+      <div class="phone">
+        <div class="total" aria-live="polite">
+          <p class="label" id="total-label">Revenue lost to missed calls</p>
+          <p class="money"><span id="monthly">$0</span><span style="font-size:.38em;font-stretch:100%;color:var(--ink-soft)"> /month</span></p>
+          <p class="sub"><strong id="yearly">$0</strong> a year, from <strong id="jobs">0</strong> jobs a month that never got booked.</p>
+        </div>
+
+        <div class="log-head"><h2>A typical week’s missed calls</h2><span id="week-count"></span></div>
+        <ol class="log" id="log"></ol>
+
+        <div class="recover">
+          <p>An AI receptionist answers every call, books the job and texts back anyone who hangs up. Recovering even 70% of these calls is worth <span class="green" id="recover">$0</span> a month.</p>
+          <div class="actions">
+            <a class="cta" href="https://www.trxmode.com/booking-page" id="book">Book a free Revenue Leak Audit</a>
+            <button type="button" class="ghost" id="share">Copy link to these numbers</button>
+          </div>
+          <p class="status" id="status" role="status"></p>
+        </div>
+      </div>
+
+      <details>
+        <summary>How this is calculated</summary>
+        <div class="math" id="math"></div>
+      </details>
+    </aside>
+  </div>
+</main>
+
+<div class="peek" id="peek" aria-hidden="true">
+  <div><span>Lost each month</span><br><b id="peek-money">$0</b></div>
+  <a href="#log">See the calls</a>
+</div>
+
+<footer class="wrap">
+  <p>The figures are estimates built only from the numbers you enter. Nothing you type is stored or sent anywhere; it all runs in your browser.</p>
+  <p>Built by <a href="https://linkedin.com/in/chaudhryusmantrx">Chaudhry Usman</a> at <a href="https://trxmode.com">TRXmode</a>, which builds AI receptionists and lead follow-up systems for service businesses.</p>
+</footer>
+
+<script>
+(() => {
+  const PRESETS = {
+    dental:   { calls: 15, newp: 60, book: 50, value: 600 },
+    medspa:   { calls: 12, newp: 65, book: 40, value: 450 },
+    hvac:     { calls: 18, newp: 70, book: 45, value: 450 },
+    plumbing: { calls: 16, newp: 75, book: 50, value: 380 },
+    auto:     { calls: 20, newp: 55, book: 45, value: 420 },
+    roofing:  { calls: 10, newp: 80, book: 25, value: 9000 },
+    chiro:    { calls: 12, newp: 55, book: 50, value: 350 },
+    custom:   null,
+  };
+  const FIELDS = {
+    calls: { min: 0, max: 1000 },
+    newp:  { min: 0, max: 100 },
+    book:  { min: 0, max: 100 },
+    value: { min: 0, max: 1000000 },
+  };
+  const WEEKS = 4.3;
+  const $ = id => document.getElementById(id);
+  const fmt = n => '$' + Math.round(n).toLocaleString('en-US');
+  const state = {};
+
+  const clamp = (k, v) => {
+    v = Number(v);
+    if (!Number.isFinite(v)) v = 0;
+    return Math.min(FIELDS[k].max, Math.max(FIELDS[k].min, v));
+  };
+
+  function set(k, v, from) {
+    state[k] = clamp(k, v);
+    const r = $(k + '-r'), n = $(k + '-n');
+    if (from !== 'r') r.value = Math.min(Number(r.max), state[k]);
+    if (from !== 'n') n.value = state[k];
+  }
+
+  // Deterministic pseudo-random so the log doesn't jump around on every keystroke
+  function rng(seed) {
+    let s = seed >>> 0 || 1;
+    return () => (s = (s * 1664525 + 1013904223) >>> 0) / 4294967296;
+  }
+  const DAYS = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
+  const SLOTS = [[12, 13], [17, 21], [17, 21], [7, 8], [21, 23], [10, 16]]; // weighted toward lunch and after hours
+  const CALLERS = ['Unknown caller', 'Mobile', 'Unknown caller', 'Local number', 'Unknown caller', 'Mobile'];
+
+  const ICON = '<svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M6.6 10.8a15.1 15.1 0 0 0 6.6 6.6l2.2-2.2a1 1 0 0 1 1-.25 11.4 11.4 0 0 0 3.6.57 1 1 0 0 1 1 1V20a1 1 0 0 1-1 1A17 17 0 0 1 3 4a1 1 0 0 1 1-1h3.5a1 1 0 0 1 1 1c0 1.25.2 2.45.57 3.57a1 1 0 0 1-.25 1z"/><path fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" d="M15 3l6 6M21 3l-6 6"/></svg>';
+
+  function render() {
+    const { calls, newp, book, value } = state;
+    const perWeekJobs = calls * (newp / 100) * (book / 100);
+    const monthlyJobs = perWeekJobs * WEEKS;
+    const monthly = monthlyJobs * value;
+    const recover = monthly * 0.7;
+
+    $('monthly').textContent = fmt(monthly);
+    $('peek-money').textContent = fmt(monthly);
+    $('yearly').textContent = fmt(monthly * 12);
+    $('jobs').textContent = monthlyJobs < 10 ? monthlyJobs.toFixed(1).replace(/\.0$/, '') : Math.round(monthlyJobs);
+    $('recover').textContent = fmt(recover);
+
+    // Call log for one week
+    const shown = Math.min(Math.round(calls), 9);
+    const jobCount = Math.round(perWeekJobs);
+    const r = rng(Math.round(calls) * 97 + 13);
+    const items = [];
+    for (let i = 0; i < Math.round(calls); i++) {
+      const slot = SLOTS[Math.floor(r() * SLOTS.length)];
+      const hour = slot[0] + Math.floor(r() * (slot[1] - slot[0]));
+      const min = Math.floor(r() * 60);
+      items.push({ day: Math.floor(r() * 7), hour, min, caller: CALLERS[Math.floor(r() * CALLERS.length)] });
+    }
+    items.sort((a, b) => a.day - b.day || a.hour - b.hour || a.min - b.min);
+    // spread the "would have booked" calls evenly across the week
+    const jobIdx = new Set();
+    for (let j = 0; j < Math.min(jobCount, items.length); j++) jobIdx.add(Math.floor((j + 0.5) * items.length / jobCount));
+
+    const visible = items.slice(0, shown);
+    const html = visible.map((c, i) => {
+      const isJob = jobIdx.has(i);
+      const h12 = ((c.hour + 11) % 12) + 1, ap = c.hour < 12 ? 'am' : 'pm';
+      const when = `${DAYS[c.day]} ${h12}:${String(c.min).padStart(2, '0')} ${ap}`;
+      const label = isJob ? 'New customer, would have booked' : (i % 3 === 0 ? 'Existing customer' : 'Didn’t become a job');
+      return `<li class="${isJob ? 'job' : ''}">${ICON}<div><div class="who">${c.caller}</div><div class="when">Missed · ${when} · ${label}</div></div><div class="val">${isJob ? '−' + fmt(value) : '—'}</div></li>`;
+    }).join('');
+    const rest = items.length - shown;
+    const restJobs = [...jobIdx].filter(i => i >= shown).length;
+    $('log').innerHTML = items.length === 0
+      ? '<li><span></span><div class="who">No missed calls entered. If that’s true, you’re in great shape.</div><span></span></li>'
+      : html + (rest > 0 ? `<li class="more" style="display:block">…and ${rest} more missed call${rest > 1 ? 's' : ''} this week${restJobs ? `, ${restJobs} of them a booked job` : ''}.</li>` : '');
+    $('week-count').textContent = `${Math.round(calls)} missed`;
+
+    $('math').innerHTML = `
+      <p>${calls} missed calls a week × <strong>${newp}%</strong> new customers × <strong>${book}%</strong> booking rate = <strong>${perWeekJobs.toFixed(2)}</strong> lost jobs a week</p>
+      <p>${perWeekJobs.toFixed(2)} × ${WEEKS} weeks in a month = <strong>${monthlyJobs.toFixed(1)}</strong> lost jobs a month</p>
+      <p>${monthlyJobs.toFixed(1)} × ${fmt(value)} average value = <strong>${fmt(monthly)}</strong> a month</p>
+      <p>This counts only the first job. Repeat visits, referrals and reviews from those customers are extra.</p>`;
+
+    const q = new URLSearchParams({ niche: $('niche').value, calls, newp, book, value });
+    try { history.replaceState(null, '', '?' + q.toString()); } catch { /* file:// or sandboxed preview */ }
+  }
+
+  function applyPreset(name) {
+    const p = PRESETS[name];
+    if (!p) return;
+    Object.keys(p).forEach(k => set(k, p[k]));
+  }
+
+  // Wire inputs
+  Object.keys(FIELDS).forEach(k => {
+    $(k + '-r').addEventListener('input', e => { set(k, e.target.value, 'r'); render(); });
+    $(k + '-n').addEventListener('input', e => { if (e.target.value === '') return; set(k, e.target.value, 'n'); render(); });
+    $(k + '-n').addEventListener('blur', e => { set(k, e.target.value); render(); });
+    const markCustom = () => { $('niche').value = 'custom'; };
+    $(k + '-r').addEventListener('change', markCustom);
+    $(k + '-n').addEventListener('change', markCustom);
+  });
+  $('niche').addEventListener('change', e => { applyPreset(e.target.value); render(); });
+
+  $('share').addEventListener('click', async () => {
+    try { await navigator.clipboard.writeText(location.href); $('status').textContent = 'Link copied. Anyone who opens it sees these numbers.'; }
+    catch { $('status').textContent = 'Copy the address from your browser bar to share these numbers.'; }
+  });
+
+  // Hide the mobile peek bar once the real result is on screen
+  if ('IntersectionObserver' in window) {
+    new IntersectionObserver(([e]) => $('peek').classList.toggle('hide', e.isIntersecting), { threshold: 0.2 })
+      .observe(document.querySelector('.total'));
+  }
+
+  // Start from URL params, else HVAC preset
+  const q = new URLSearchParams(location.search);
+  const niche = PRESETS.hasOwnProperty(q.get('niche')) ? q.get('niche') : 'hvac';
+  $('niche').value = niche;
+  applyPreset(niche === 'custom' ? 'hvac' : niche);
+  Object.keys(FIELDS).forEach(k => { if (q.has(k)) set(k, q.get(k)); });
+  render();
+})();
+</script>
+</body>
+</html>
