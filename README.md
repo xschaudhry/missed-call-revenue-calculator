@@ -51,4 +51,4 @@ Repo **Settings → Pages → Deploy from a branch → `main` / root**.
 
 ---
 
-Built by [Chaudhry Usman](https://linkedin.com/in/chaudhryusmantrx) at [TRXmode](https://trxmode.com): AI receptionists, speed-to-lead and follow-up systems for service businesses. [Book a free Revenue Leak Audit](https://www.trxmode.com/booking-page).
+Built by [Chaudhry Usman](https://linkedin.com/in/xschaudhry) at [TRXmode](https://trxmode.com): AI receptionists, speed-to-lead and follow-up systems for service businesses. [Book a free Revenue Leak Audit](https://www.trxmode.com/booking-page).
